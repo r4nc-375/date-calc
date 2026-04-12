@@ -52,11 +52,9 @@ static int date_cmp(int ya, int ma, int da, int yb, int mb, int db) {
 }
 
 DateDiff date_difference(int y1, int m1, int d1, int y2, int m2, int d2) {
-	DateDiff r = {0, 0, 0, 0};
 	int ord = date_cmp(y1, m1, d1, y2, m2, d2);
-
 	if (ord == 0)
-		return r;
+		return (DateDiff){0, 0, 0, 0};
 	if (ord > 0) {
 		int t;
 
@@ -86,11 +84,7 @@ DateDiff date_difference(int y1, int m1, int d1, int y2, int m2, int d2) {
 		m += 12;
 	}
 
-	r.years = y;
-	r.months = m;
-	r.weeks = d / 7;
-	r.days = d % 7;
-	return r;
+	return (DateDiff){y, m, d / 7, d % 7};
 }
 
 // GUI
