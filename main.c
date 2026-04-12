@@ -90,7 +90,7 @@ DateDiff date_difference(int y1, int m1, int d1, int y2, int m2, int d2) {
 // GUI
 GtkWidget *cal1, *cal2, *lDiff;
 
-static void day_selected(GtkCalendar* self, gpointer user_data) {
+static void day_selected() {
 	guint year1, month1, day1;
 	gtk_calendar_get_date(GTK_CALENDAR(cal1), &year1, &month1, &day1);
 	int jd1 = computeJD(year1, month1 + 1, day1);
