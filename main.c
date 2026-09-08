@@ -1,5 +1,10 @@
+#ifndef CLI
 #include <gtk/gtk.h>
-
+#else
+#include "args.h"
+#include <stdlib.h>
+#include <stdio.h>
+#endif
 //https://support.microsoft.com/ru-ru/windows/%D0%B2%D1%8B%D1%87%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0-%D0%B4%D0%BD%D0%B5%D0%B9-%D0%BC%D0%B5%D0%B6%D0%B4%D1%83-%D0%B4%D0%B0%D1%82%D0%B0%D0%BC%D0%B8-%D0%B2%D1%8B%D1%87%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B4%D0%B0%D1%82%D1%8B-%D0%B2-%D0%BF%D1%80%D0%BE%D1%88%D0%BB%D0%BE%D0%BC-%D0%B8%D0%BB%D0%B8-%D0%B2-%D0%B1%D1%83%D0%B4%D1%83%D1%89%D0%B5%D0%BC-c12972c8-1c93-a4e6-32d0-0067004faa43
 
 typedef struct {
@@ -8,7 +13,13 @@ typedef struct {
 	int weeks;
 	int days;
 } DateDiff;
-
+#ifdef CLI
+typedef struct {
+	int years;
+	int months;
+	int days;
+} NumToDate;
+#endif
 static int computeJD(int y, int m, int d) {
 	if (m <= 2) {
 		y--;
@@ -86,7 +97,7 @@ DateDiff date_difference(int y1, int m1, int d1, int y2, int m2, int d2) {
 
 	return (DateDiff){y, m, d / 7, d % 7};
 }
-
+#ifndef CLI
 // GUI
 GtkWidget *cal1, *cal2, *lDiff;
 
@@ -113,8 +124,9 @@ static void day_selected() {
 		diff, (diff == 1) ? "день" : ((diff == 0 || diff >= 5) ? "дней" : "дня"));
 	gtk_label_set_label(GTK_LABEL(lDiff), buf);
 }
-
+#endif
 int main(int argc, char *argv[]) {
+#ifndef CLI
 	gtk_init(&argc, &argv);
 
 	GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -140,4 +152,39 @@ int main(int argc, char *argv[]) {
 	gtk_main();
 
 	return 0;
+#else
+	dates dates_parsed = parse(argc, argv);
+	int divisors[] = {10000, 100};
+	NumToDate date[2] = {0};
+		
+	date[0].years = dates_parsed.date1 / divisors[0];
+	dates_parsed.date1 -= date[0].years * divisors[0];
+	date[0].months = dates_parsed.date1 / divisors[1];
+	dates_parsed.date1 -= date[0].months * divisors[1];
+	date[0].days = dates_parsed.date1;
+
+	date[1].years = dates_parsed.date2 / divisors[0];
+	dates_parsed.date2 -= date[1].years * divisors[0];
+	date[1].months = dates_parsed.date2 / divisors[1];
+	dates_parsed.date2 -= date[1].months * divisors[1];
+	date[1].days = dates_parsed.date2;
+	
+	int y1 = date[0].years;
+	int m1 = date[0].months;
+	int d1 = date[0].days;
+	int y2 = date[1].years;
+	int m2 = date[1].months;
+	int d2 = date[1].days;
+
+	DateDiff dd = date_difference(y1, m1, d1, y2, m2, d2);
+	printf("Difference between dates:\n");
+    printf("  %d years, %d months, %d weeks, %d days\n",
+           dd.years, dd.months, dd.weeks, dd.days);
+	int jd1 = computeJD(y1, m1, d1);
+    int jd2 = computeJD(y2, m2, d2);
+    int total_days = abs(jd2 - jd1);
+    printf("  Total: %d days\n", total_days);
+
+	return 0;
+#endif
 }
