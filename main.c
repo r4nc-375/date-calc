@@ -106,11 +106,11 @@ static void day_selected() {
 	snprintf(buf, sizeof(buf),
 		"%i %s, %i %s, %i %s, %i %s\n"
 		"(%i %s)",
-		dd.years, (dd.years == 1) ? "год" : ((dd.years == 0 || dd.years >= 5) ? "лет" : "года"),
+		dd.years, ((dd.years % 100 >= 11 && dd.years % 100 <= 14) || (dd.years % 10 == 0 || dd.years % 10 >= 5)) ? "лет" : (( dd.years % 10 == 1) ? "год" : "года"),
 		dd.months, (dd.months == 1) ? "месяц" : ((dd.months == 0 || dd.months >= 5) ? "месяцев" : "месяца"),
-		dd.weeks, (dd.weeks == 1) ? "неделя" : ((dd.weeks == 0 || dd.weeks >= 5) ? "недель" : "недели"),
+		dd.weeks, (dd.weeks == 1) ? "неделя" : ((dd.weeks == 0) ? "недель" : "недели"),
 		dd.days, (dd.days == 1) ? "день" : ((dd.days == 0 || dd.days >= 5) ? "дней" : "дня"),
-		diff, (diff == 1) ? "день" : ((diff == 0 || diff >= 5) ? "дней" : "дня"));
+		diff, ((diff % 100 >= 11 && diff % 100 <= 14) || (diff % 10 == 0 || diff % 10 >= 5) ? "дней" : ((diff % 10 == 1) ? "день" : "дня")));
 	gtk_label_set_label(GTK_LABEL(lDiff), buf);
 }
 
